@@ -6,7 +6,7 @@ import {
     Component,
     markRaw,
     computed,
-    ComputedRef,
+    reactive,
 } from 'vue';
 
 type DialogComponent = Component | (() => Promise<Component>);
@@ -31,6 +31,7 @@ export interface Dialog<TComponent extends DialogComponent = DialogComponent, TR
     props?: ExtractComponentProps<TComponent>;
 
     _resolve: (value?: TReturnValue) => void;
+    _reject: (reason?: any) => void;
 }
 
 type ExtractReturnValue<T = Dialog> = T extends Dialog<any, infer TReturnValue>
@@ -40,16 +41,20 @@ type ExtractReturnValue<T = Dialog> = T extends Dialog<any, infer TReturnValue>
 let dialogId = 0;
 
 export interface Dialogs {
-    dialogs: Ref<Dialog[]>;
+    dialogs: Dialog[];
 
-    current: Readonly<Ref<Dialog | null>>;
+    current: Dialog | null;
 
     show: <TReturnValue = unknown, TComponent extends DialogComponent = DialogComponent>(
         component: TComponent,
         props?: ExtractComponentProps<TComponent>
     ) => Promise<TReturnValue>;
 
-    resolve: <TDialog extends Dialog>(dialog: Dialog, data?: ExtractReturnValue<TDialog>) => void;
+    resolve: <TDialog extends Dialog>(dialog: TDialog, data?: ExtractReturnValue<TDialog>) => void;
+
+    reject: <TDialog extends Dialog>(dialog: TDialog) => void;
+
+    rejectAll: () => void;
 }
 
 export function createDialogs() {
@@ -63,15 +68,20 @@ export function createDialogs() {
         component: TComponent,
         props?: ExtractComponentProps<TComponent>
     ) {
-        let resolver: ((value?: any) => void) | null = null;
+        let resolver: ((value?: any) => void) | undefined;
+        let rejecter: ((reason?: any) => void) | undefined;
 
-        const p = new Promise<TReturnValue>((resolve) => (resolver = resolve));
+        const p = new Promise<TReturnValue>((resolve, reject) => {
+            resolver = resolve;
+            rejecter = reject;
+        });
 
         const dialog: Dialog<TComponent, ExtractComponentProps<TComponent>> = {
             id: (dialogId++).toString(),
             component: markRaw(component),
             props: props,
             _resolve: resolver!,
+            _reject: rejecter!,
         };
 
         dialogs.value.push(dialog);
@@ -79,9 +89,7 @@ export function createDialogs() {
         return p;
     }
 
-    function resolve<TDialog extends Dialog>(dialog: TDialog, data?: ExtractReturnValue<TDialog>) {
-        dialog._resolve(data);
-
+    function remove<TDialog extends Dialog>(dialog: TDialog) {
         const index = dialogs.value.indexOf(dialog);
 
         if (index > -1) {
@@ -89,12 +97,32 @@ export function createDialogs() {
         }
     }
 
-    const dialogManager: Dialogs = {
+    function resolve<TDialog extends Dialog>(dialog: TDialog, data?: ExtractReturnValue<TDialog>) {
+        dialog._resolve(data);
+
+        remove(dialog);
+    }
+
+    function reject<TDialog extends Dialog>(dialog: TDialog) {
+        dialog._reject();
+
+        remove(dialog);
+    }
+
+    function rejectAll() {
+        dialogs.value.forEach((d) => d._reject());
+
+        dialogs.value = [];
+    }
+
+    const dialogManager: Dialogs = reactive({
         show,
         resolve,
+        reject,
+        rejectAll,
         dialogs,
         current,
-    };
+    });
 
     return dialogManager;
 }

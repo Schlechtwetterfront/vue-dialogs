@@ -11,14 +11,14 @@ export default defineComponent({
         }
 
         return () => {
-            const current = dialogs?.current.value;
+            const current = dialogs?.current;
 
             return h(
                 'div',
                 {
                     class: {
                         'v-dialogs': true,
-                        'v-dialogs--with-dialogs': dialogs?.dialogs.value.length ?? 0 > 0,
+                        'v-dialogs--with-dialogs': dialogs?.dialogs.length ?? 0 > 0,
                     },
                 },
                 current
