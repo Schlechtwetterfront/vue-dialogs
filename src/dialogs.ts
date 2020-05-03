@@ -15,12 +15,12 @@ type ExtractComponentProps<
     TComponent extends DialogComponent
 > = TComponent extends ComponentOptionsBase<infer CProps, any, any, any, any, any> // ^- Standard component
     ? CProps extends Readonly<infer RawCProps> // Props may be Readonly<...>, so extract again
-        ? RawCProps
-        : CProps
+        ? RawCProps | Ref<RawCProps>
+        : CProps | Ref<CProps>
     : TComponent extends FunctionalComponent<infer FCProps> // Functional component
     ? FCProps extends Readonly<infer RawFCProps> // Props may be Readonly<...? again
-        ? RawFCProps
-        : FCProps
+        ? RawFCProps | Ref<RawFCProps>
+        : FCProps | Ref<FCProps>
     : any;
 
 export interface Dialog<TComponent extends DialogComponent = DialogComponent, TReturnValue = any> {
