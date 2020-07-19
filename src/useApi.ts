@@ -1,9 +1,8 @@
 import { inject, getCurrentInstance } from 'vue';
-import { Dialogs } from './dialogs';
 import { DIALOGS_KEY } from './injectionKeys';
 
 export function useDialogs() {
-    const dialogs = inject<Dialogs>(DIALOGS_KEY);
+    const dialogs = inject(DIALOGS_KEY);
 
     return dialogs;
 }

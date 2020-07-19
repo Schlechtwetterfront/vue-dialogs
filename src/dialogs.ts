@@ -1,56 +1,47 @@
-import {
-    ComponentOptionsBase,
-    ref,
-    Ref,
-    FunctionalComponent,
-    Component,
-    markRaw,
-    computed,
-    reactive,
-} from 'vue';
+import { ref, markRaw, computed, reactive, ComponentPublicInstance } from 'vue';
 
-type DialogComponent = Component | (() => Promise<Component>);
+/**
+ * Component constructor returned by defineComponent
+ */
+type ComponentConstructor<T extends ComponentPublicInstance> = new (...args: any) => T;
 
-type ExtractComponentProps<
-    TComponent extends DialogComponent
-> = TComponent extends ComponentOptionsBase<infer CProps, any, any, any, any, any> // ^- Standard component
-    ? CProps extends Readonly<infer RawCProps> // Props may be Readonly<...>, so extract again
-        ? RawCProps | Ref<RawCProps>
-        : CProps | Ref<CProps>
-    : TComponent extends FunctionalComponent<infer FCProps> // Functional component
-    ? FCProps extends Readonly<infer RawFCProps> // Props may be Readonly<...? again
-        ? RawFCProps | Ref<RawFCProps>
-        : FCProps | Ref<FCProps>
-    : any;
+/**
+ * Extract props type if possible
+ */
+type ExtractProps<ComponentDef> = ComponentDef extends ComponentConstructor<infer ComponentProps>
+    ? InstanceType<ComponentConstructor<ComponentProps>>['$props']
+    : unknown;
 
-export interface Dialog<TComponent extends DialogComponent = DialogComponent, TReturnValue = any> {
-    id: string;
+/**
+ * Dialog definition
+ */
+export interface Dialog<ComponentDef = {}> {
+    readonly _id: string;
 
-    component: TComponent;
+    readonly component: ComponentDef;
 
-    props?: ExtractComponentProps<TComponent>;
+    props?: ExtractProps<ComponentDef>;
 
-    _resolve: (value?: TReturnValue) => void;
+    _resolve: (value?: any) => void;
     _reject: (reason?: any) => void;
 }
 
-type ExtractReturnValue<T = Dialog> = T extends Dialog<any, infer TReturnValue>
-    ? TReturnValue
-    : any;
-
 let dialogId = 0;
 
+/**
+ * Dialog manager
+ */
 export interface Dialogs {
     dialogs: Dialog[];
 
     current: Dialog | null;
 
-    show: <TReturnValue = unknown, TComponent extends DialogComponent = DialogComponent>(
-        component: TComponent,
-        props?: ExtractComponentProps<TComponent>
-    ) => Promise<TReturnValue>;
+    show: <ReturnValue = unknown, ComponentDef extends {} = {}>(
+        component: ComponentDef,
+        props?: ExtractProps<ComponentDef>
+    ) => Promise<ReturnValue>;
 
-    resolve: <TDialog extends Dialog>(dialog: TDialog, data?: ExtractReturnValue<TDialog>) => void;
+    resolve: <TDialog extends Dialog>(dialog: TDialog, data?: any) => void;
 
     reject: <TDialog extends Dialog>(dialog: TDialog) => void;
 
@@ -64,20 +55,20 @@ export function createDialogs() {
         dialogs.value.length > 0 ? dialogs.value[dialogs.value.length - 1] : null
     );
 
-    function show<TReturnValue = unknown, TComponent extends DialogComponent = DialogComponent>(
-        component: TComponent,
-        props?: ExtractComponentProps<TComponent>
+    function show<ReturnValue = unknown, ComponentDef extends {} = {}>(
+        component: ComponentDef,
+        props?: ExtractProps<ComponentDef>
     ) {
         let resolver: ((value?: any) => void) | undefined;
         let rejecter: ((reason?: any) => void) | undefined;
 
-        const p = new Promise<TReturnValue>((resolve, reject) => {
+        const p = new Promise<ReturnValue>((resolve, reject) => {
             resolver = resolve;
             rejecter = reject;
         });
 
-        const dialog: Dialog<TComponent, ExtractComponentProps<TComponent>> = {
-            id: (dialogId++).toString(),
+        const dialog = {
+            _id: (dialogId++).toString(),
             component: markRaw(component),
             props: props,
             _resolve: resolver!,
@@ -97,7 +88,7 @@ export function createDialogs() {
         }
     }
 
-    function resolve<TDialog extends Dialog>(dialog: TDialog, data?: ExtractReturnValue<TDialog>) {
+    function resolve<TDialog extends Dialog>(dialog: TDialog, data?: any) {
         dialog._resolve(data);
 
         remove(dialog);

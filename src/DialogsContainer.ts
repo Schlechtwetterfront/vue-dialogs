@@ -25,11 +25,11 @@ export default defineComponent({
                     ? h(
                           'div',
                           {
-                              key: current.id,
+                              key: current._id,
                               class: 'v-dialog',
                           },
                           h(current.component, {
-                              ...current.props,
+                              ...(current.props instanceof Object ? current.props : {}),
                               onResolve: (returnData: any) => resolveWith(current, returnData),
                           })
                       )

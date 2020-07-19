@@ -6,13 +6,19 @@ Promise-based dialogs for Vue 3
 
 Install package
 
-...
+```bash
+# yarn
+yarn add @schlechtwetterfront/vue-dialogs
+
+# npm
+npm install @schlechtwetterfront/vue-dialogs
+```
 
 Register the plugin in your Vue app
 
 ```ts
 import { createApp } from 'vue';
-import dialogs from 'vue-dialogs';
+import dialogs from '@schlechtwetterfront/vue-dialogs';
 
 import App from '...';
 
@@ -34,7 +40,7 @@ Place a dialog container component which will hold all dialog instances. This sh
 </template>
 <script>
 import { defineComponent } from 'vue';
-import { DialogsContainer } from 'vue-dialogs';
+import { DialogsContainer } from '@schlechtwetterfront/vue-dialogs';
 
 export default defineComponent({
     components: { DialogsContainer },
@@ -57,7 +63,7 @@ Create a dialog. Dialogs are just standard Vue components. The only thing a dial
 </template>
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useDialog } from 'vue-dialog';
+import { useDialog } from '@schlechtwetterfront/vue-dialogs';
 
 export default defineComponent({
     setup() {
@@ -66,9 +72,7 @@ export default defineComponent({
 
         const ok = () => resolve();
 
-        return {
-            ok,
-        };
+        return { ok };
     },
 });
 </script>
@@ -78,7 +82,7 @@ Show your component. `useDialogs` returns the dialog "manager". `dialogs.show` r
 
 ```ts
 import { defineComponent } from 'vue';
-import { useDialogs } from 'vue-dialogs';
+import { useDialogs } from '@schlechtwetterfront/vue-dialogs';
 
 import InfoDialog from '...';
 
@@ -92,12 +96,12 @@ export default defineComponent({
             // Dialog is closed here
         }
 
-        return { openInfo };
+        return { openDialog };
     },
 });
 ```
 
-Set up some CSS to display the dialogs
+Set up some (S)CSS to display the dialogs
 
 ```scss
 // Dialog container and overlay
@@ -143,7 +147,7 @@ The `resolve` function takes a single optional argument `data`. Any data/input g
 </template>
 <script lang="ts">
 import { defineComponent, reactive } from 'vue';
-import { useDialog } from '../../src';
+import { useDialog } from '@schlechtwetterfront/vue-dialogs';
 
 export default defineComponent({
     setup() {
@@ -164,10 +168,14 @@ export default defineComponent({
 
 ```ts
 import { defineComponent } from 'vue';
-import { useDialogs } from 'vue-dialogs';
+import { useDialogs } from '@schlechtwetterfront/vue-dialogs';
 
 import FormDialog from '...';
-import FormInterface from '...';
+
+interface Form {
+    field1: string;
+    field2: string;
+}
 
 export default defineComponent({
     setup() {
@@ -179,9 +187,7 @@ export default defineComponent({
             }
 
             // Explicitly specify return value as type param
-            const returnValue = await dialogs.show<FormInterface>(FormDialog);
-
-            // Dialog is closed here
+            const returnValue = await dialogs.show<Form>(FormDialog);
         }
 
         return { openInfo };
@@ -195,7 +201,7 @@ Props can be passed to dialog components like any other components. `dialogs.sho
 
 ```ts
 import { defineComponent } from 'vue';
-import { useDialogs } from 'vue-dialogs';
+import { useDialogs } from '@schlechtwetterfront/vue-dialogs';
 
 import InfoDialog from '...';
 
@@ -214,3 +220,19 @@ export default defineComponent({
 ```
 
 Refs (`ref`, `computed`) and reactive objects can be passed into the props, too
+
+#### Getting typed props and specifying the return value
+
+Due to a limitation of TypeScript (lack of partial generics interference), the type of the component props cannot be inferred if the type of the return value is specified
+
+```ts
+await dialogs.show<boolean>(DialogComponent, { prop: 'value' });
+// Cannot be inferred ------------------------------ ^^^^^^^
+```
+
+In that case, the type of the component has to be explicitly specified
+
+```ts
+await dialogs.show<boolean, typeof DialogComponent>(DialogComponent, { prop: 'value' });
+// Specify component type - ^^^^^^^^^^^^^^^^^^^^^^
+```

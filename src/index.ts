@@ -1,5 +1,5 @@
-import { App, Plugin, createApp, h } from 'vue';
-import { createDialogs, Dialogs } from './dialogs';
+import { App, Plugin } from 'vue';
+import { createDialogs, Dialogs, Dialog } from './dialogs';
 import { DIALOGS_KEY } from './injectionKeys';
 import DialogsContainer from './DialogsContainer';
 
@@ -21,6 +21,6 @@ const plugin: Plugin = {
 
 export default plugin;
 
-export { DialogsContainer };
+export { DialogsContainer, DIALOGS_KEY, Dialogs, Dialog };
 
 export * from './useApi';
