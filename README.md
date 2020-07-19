@@ -223,7 +223,7 @@ Refs (`ref`, `computed`) and reactive objects can be passed into the props, too
 
 #### Getting typed props and specifying the return value
 
-Due to a limitation of TypeScript (lack of partial generics interference), the type of the component props cannot be inferred if the type of the return value is specified
+Due to a limitation of TypeScript (lack of partial generics inference), the type of the component props cannot be inferred if the type of the return value is specified
 
 ```ts
 await dialogs.show<boolean>(DialogComponent, { prop: 'value' });
