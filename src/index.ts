@@ -19,8 +19,6 @@ const plugin: Plugin = {
     },
 };
 
-export default plugin;
-
-export { DialogsContainer, DIALOGS_KEY, Dialogs, Dialog };
+export { plugin as dialogs, DialogsContainer, DIALOGS_KEY, Dialogs, Dialog };
 
 export * from './useApi';

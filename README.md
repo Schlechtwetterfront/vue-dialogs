@@ -18,7 +18,7 @@ Register the plugin in your Vue app
 
 ```ts
 import { createApp } from 'vue';
-import dialogs from '@schlechtwetterfront/vue-dialogs';
+import { dialogs } from '@schlechtwetterfront/vue-dialogs';
 
 import App from '...';
 
