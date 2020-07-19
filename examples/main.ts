@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import dialogs from '../src';
+import { dialogs } from '../src';
 
 import App from './components/App.vue';
 
