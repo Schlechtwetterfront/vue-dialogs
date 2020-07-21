@@ -1,12 +1,12 @@
 import { defineComponent, inject, h } from 'vue';
 import { DIALOGS_KEY } from './injectionKeys';
-import { Dialog } from './dialogs';
+import { DialogDef } from './dialogs';
 
 export default defineComponent({
     setup() {
         const dialogs = inject(DIALOGS_KEY);
 
-        function resolveWith(dialog: Dialog, data: any) {
+        function resolveWith(dialog: DialogDef, data: any) {
             dialogs?.resolve(dialog, data);
         }
 

@@ -86,13 +86,15 @@ export default defineComponent({
         });
 
         async function openInfo() {
-            await dialogs?.show(InfoDialog);
+            await dialogs?.from(InfoDialog).show();
         }
 
         async function openInfoWithProps() {
-            await dialogs?.show(InfoDialog, {
-                text: 'Simple info dialog with text passed via props',
-            });
+            await dialogs
+                ?.from(InfoDialog, {
+                    text: 'Simple info dialog with text passed via props',
+                })
+                .show();
         }
 
         async function openConfirm() {
@@ -100,7 +102,7 @@ export default defineComponent({
                 return;
             }
 
-            const r = await dialogs.show<boolean>(ConfirmDialog);
+            const r = await dialogs.from(ConfirmDialog).show<boolean>();
 
             state.confirmResponse = r;
         }
@@ -109,9 +111,11 @@ export default defineComponent({
             let index = 0;
 
             for (let index = 0; index < 3; index++) {
-                dialogs?.show(InfoDialog, {
-                    text: `Info dialog ${index}`,
-                });
+                dialogs
+                    ?.from(InfoDialog, {
+                        text: `Info dialog ${index}`,
+                    })
+                    .show();
             }
         }
 
@@ -120,7 +124,7 @@ export default defineComponent({
                 return;
             }
 
-            state.formResponse = await dialogs.show<Form>(FormDialog);
+            state.formResponse = await dialogs.from(FormDialog).show<Form>();
         }
 
         const propsCounter = ref(0);
@@ -131,7 +135,7 @@ export default defineComponent({
                 propsCounter.value++;
             }, 333);
 
-            await dialogs?.show(InfoDialog, props);
+            await dialogs?.from(InfoDialog, props).show();
 
             clearInterval(interval);
         }

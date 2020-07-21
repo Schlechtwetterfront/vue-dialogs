@@ -15,7 +15,7 @@ type ExtractProps<ComponentDef> = ComponentDef extends ComponentConstructor<infe
 /**
  * Dialog definition
  */
-export interface Dialog<ComponentDef = {}> {
+export interface DialogDef<ComponentDef = {}> {
     readonly _id: string;
 
     readonly component: ComponentDef;
@@ -26,61 +26,69 @@ export interface Dialog<ComponentDef = {}> {
     _reject: (reason?: any) => void;
 }
 
+interface Dialog {
+    show: <ReturnValue = unknown>() => Promise<ReturnValue>;
+}
+
 let dialogId = 0;
 
 /**
  * Dialog manager
  */
 export interface Dialogs {
-    dialogs: Dialog[];
+    dialogs: DialogDef[];
 
-    current: Dialog | null;
+    current: DialogDef | null;
 
-    show: <ReturnValue = unknown, ComponentDef extends {} = {}>(
+    from: <ComponentDef extends {} = {}>(
         component: ComponentDef,
         props?: ExtractProps<ComponentDef>
-    ) => Promise<ReturnValue>;
+    ) => Dialog;
 
-    resolve: <TDialog extends Dialog>(dialog: TDialog, data?: any) => void;
+    resolve: <TDialog extends DialogDef>(dialog: TDialog, data?: any) => void;
 
-    reject: <TDialog extends Dialog>(dialog: TDialog) => void;
+    reject: <TDialog extends DialogDef>(dialog: TDialog) => void;
 
     rejectAll: () => void;
 }
 
 export function createDialogs() {
-    const dialogs = ref<Dialog[]>([]);
+    const dialogs = ref<DialogDef[]>([]);
 
     const current = computed(() =>
         dialogs.value.length > 0 ? dialogs.value[dialogs.value.length - 1] : null
     );
 
-    function show<ReturnValue = unknown, ComponentDef extends {} = {}>(
+    function from<ComponentDef extends {} = {}>(
         component: ComponentDef,
         props?: ExtractProps<ComponentDef>
-    ) {
-        let resolver: ((value?: any) => void) | undefined;
-        let rejecter: ((reason?: any) => void) | undefined;
+    ): Dialog {
+        const show = <ReturnValue = unknown>() => {
+            let resolver: ((value?: any) => void) | undefined;
+            let rejecter: ((reason?: any) => void) | undefined;
 
-        const p = new Promise<ReturnValue>((resolve, reject) => {
-            resolver = resolve;
-            rejecter = reject;
-        });
+            const p = new Promise<ReturnValue>((resolve, reject) => {
+                resolver = resolve;
+                rejecter = reject;
+            });
 
-        const dialog = {
-            _id: (dialogId++).toString(),
-            component: markRaw(component),
-            props: props,
-            _resolve: resolver!,
-            _reject: rejecter!,
+            const dialog = {
+                _id: (dialogId++).toString(),
+                component: markRaw(component),
+                props: props,
+                _resolve: resolver!,
+                _reject: rejecter!,
+            };
+
+            dialogs.value.push(dialog);
+
+            return p;
         };
 
-        dialogs.value.push(dialog);
-
-        return p;
+        return { show };
     }
 
-    function remove<TDialog extends Dialog>(dialog: TDialog) {
+    function remove<TDialog extends DialogDef>(dialog: TDialog) {
         const index = dialogs.value.indexOf(dialog);
 
         if (index > -1) {
@@ -88,13 +96,13 @@ export function createDialogs() {
         }
     }
 
-    function resolve<TDialog extends Dialog>(dialog: TDialog, data?: any) {
+    function resolve<TDialog extends DialogDef>(dialog: TDialog, data?: any) {
         dialog._resolve(data);
 
         remove(dialog);
     }
 
-    function reject<TDialog extends Dialog>(dialog: TDialog) {
+    function reject<TDialog extends DialogDef>(dialog: TDialog) {
         dialog._reject();
 
         remove(dialog);
@@ -107,7 +115,7 @@ export function createDialogs() {
     }
 
     const dialogManager: Dialogs = reactive({
-        show,
+        from,
         resolve,
         reject,
         rejectAll,

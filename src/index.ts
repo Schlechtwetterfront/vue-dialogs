@@ -1,5 +1,5 @@
 import { App, Plugin } from 'vue';
-import { createDialogs, Dialogs, Dialog } from './dialogs';
+import { createDialogs, Dialogs, DialogDef } from './dialogs';
 import { DIALOGS_KEY } from './injectionKeys';
 import DialogsContainer from './DialogsContainer';
 
@@ -19,6 +19,6 @@ const plugin: Plugin = {
     },
 };
 
-export { plugin as dialogs, DialogsContainer, DIALOGS_KEY, Dialogs, Dialog };
+export { plugin as dialogs, DialogsContainer, DIALOGS_KEY, Dialogs, DialogDef };
 
 export * from './useApi';

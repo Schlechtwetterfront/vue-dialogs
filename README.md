@@ -2,6 +2,8 @@
 
 Promise-based dialogs for Vue 3
 
+This package only provides the functional basics for dialogs. It provides no out-of-the-box dialog components or styling. The integration is up to the user. This should make it easier to adapt to existing apps without having clashing style/UX.
+
 ## Usage
 
 Install package
@@ -78,7 +80,7 @@ export default defineComponent({
 </script>
 ```
 
-Show your component. `useDialogs` returns the dialog "manager". `dialogs.show` returns a `Promise` that resolves when the dialog is closed
+Show your component. `useDialogs` returns the dialog "manager". `dialogs.from` will create an intermediate object from your component. This object contains one method `show` which returns a `Promise` that resolves when the dialog is closed
 
 ```ts
 import { defineComponent } from 'vue';
@@ -91,7 +93,7 @@ export default defineComponent({
         const dialogs = useDialogs();
 
         async function openDialog() {
-            await dialogs?.show(InfoDialog);
+            await dialogs?.from(InfoDialog).show();
 
             // Dialog is closed here
         }
@@ -186,8 +188,8 @@ export default defineComponent({
                 return;
             }
 
-            // Explicitly specify return value as type param
-            const returnValue = await dialogs.show<Form>(FormDialog);
+            // Explicitly specify return value as type param to `show`
+            const returnValue = await dialogs.from(FormDialog).show<Form>();
         }
 
         return { openInfo };
@@ -197,7 +199,7 @@ export default defineComponent({
 
 ### Dialog Props
 
-Props can be passed to dialog components like any other components. `dialogs.show` passes on its second argument to the component
+Props can be passed to dialog components like any other components. `dialogs.from` passes on its second argument to the component
 
 ```ts
 import { defineComponent } from 'vue';
@@ -211,7 +213,7 @@ export default defineComponent({
 
         async function openDialog() {
             // The type of the component props should automatically be extracted from the component
-            await dialogs?.show(InfoDialog, { text: 'My overriden info text' });
+            await dialogs?.from(InfoDialog, { text: 'My overriden info text' }).show();
         }
 
         return { openInfo };
@@ -220,19 +222,3 @@ export default defineComponent({
 ```
 
 Refs (`ref`, `computed`) and reactive objects can be passed into the props, too
-
-#### Getting typed props and specifying the return value
-
-Due to a limitation of TypeScript (lack of partial generics inference), the type of the component props cannot be inferred if the type of the return value is specified
-
-```ts
-await dialogs.show<boolean>(DialogComponent, { prop: 'value' });
-// Cannot be inferred ------------------------------ ^^^^^^^
-```
-
-In that case, the type of the component has to be explicitly specified
-
-```ts
-await dialogs.show<boolean, typeof DialogComponent>(DialogComponent, { prop: 'value' });
-// Specify component type - ^^^^^^^^^^^^^^^^^^^^^^
-```
