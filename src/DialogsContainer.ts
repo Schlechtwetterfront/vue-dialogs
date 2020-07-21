@@ -6,12 +6,16 @@ export default defineComponent({
     setup() {
         const dialogs = inject(DIALOGS_KEY);
 
+        if (!dialogs) {
+            throw new Error('Dialogs manager not provided. Install the dialogs plugin');
+        }
+
         function resolveWith(dialog: DialogDef, data: any) {
-            dialogs?.resolve(dialog, data);
+            dialogs!.resolve(dialog, data);
         }
 
         return () => {
-            const current = dialogs?.current;
+            const current = dialogs.current;
 
             return h(
                 'div',

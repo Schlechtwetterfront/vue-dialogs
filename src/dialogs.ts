@@ -22,11 +22,12 @@ export interface DialogDef<ComponentDef = {}> {
 
     props?: ExtractProps<ComponentDef>;
 
-    _resolve: (value?: any) => void;
-    _reject: (reason?: any) => void;
+    _resolve?: (value?: any) => void;
+    _reject?: (reason?: any) => void;
 }
 
-interface Dialog {
+interface Dialog<ComponentDef> {
+    def: DialogDef<ComponentDef>;
     show: <ReturnValue = unknown>() => Promise<ReturnValue>;
 }
 
@@ -43,7 +44,7 @@ export interface Dialogs {
     from: <ComponentDef extends {} = {}>(
         component: ComponentDef,
         props?: ExtractProps<ComponentDef>
-    ) => Dialog;
+    ) => Dialog<ComponentDef>;
 
     resolve: <TDialog extends DialogDef>(dialog: TDialog, data?: any) => void;
 
@@ -62,7 +63,13 @@ export function createDialogs() {
     function from<ComponentDef extends {} = {}>(
         component: ComponentDef,
         props?: ExtractProps<ComponentDef>
-    ): Dialog {
+    ): Dialog<ComponentDef> {
+        const dialog: DialogDef<ComponentDef> = {
+            _id: (dialogId++).toString(),
+            component: markRaw(component),
+            props: props,
+        };
+
         const show = <ReturnValue = unknown>() => {
             let resolver: ((value?: any) => void) | undefined;
             let rejecter: ((reason?: any) => void) | undefined;
@@ -72,20 +79,15 @@ export function createDialogs() {
                 rejecter = reject;
             });
 
-            const dialog = {
-                _id: (dialogId++).toString(),
-                component: markRaw(component),
-                props: props,
-                _resolve: resolver!,
-                _reject: rejecter!,
-            };
+            dialog._resolve = resolver!;
+            dialog._reject = rejecter!;
 
             dialogs.value.push(dialog);
 
             return p;
         };
 
-        return { show };
+        return { show, def: dialog };
     }
 
     function remove<TDialog extends DialogDef>(dialog: TDialog) {
@@ -97,19 +99,31 @@ export function createDialogs() {
     }
 
     function resolve<TDialog extends DialogDef>(dialog: TDialog, data?: any) {
+        if (!dialog._resolve) {
+            throw new Error("Dialog's _resolve is undefined. This is a library bug");
+        }
+
         dialog._resolve(data);
 
         remove(dialog);
     }
 
-    function reject<TDialog extends DialogDef>(dialog: TDialog) {
+    function _reject<TDialog extends DialogDef>(dialog: TDialog) {
+        if (!dialog._reject) {
+            throw new Error("Dialog's _reject is undefined. This is a library bug");
+        }
+
         dialog._reject();
+    }
+
+    function reject<TDialog extends DialogDef>(dialog: TDialog) {
+        _reject(dialog);
 
         remove(dialog);
     }
 
     function rejectAll() {
-        dialogs.value.forEach((d) => d._reject());
+        dialogs.value.forEach((d) => _reject(d));
 
         dialogs.value = [];
     }
