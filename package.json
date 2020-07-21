@@ -6,6 +6,11 @@
     "repository": "https://github.com/Schlechtwetterfront/vue-dialogs.git",
     "author": "Benedikt Schatz",
     "license": "MIT",
+    "keywords": [
+        "vue",
+        "dialogs",
+        "promise"
+    ],
     "scripts": {
         "bundle": "yarn build && yarn build:dts",
         "build": "rollup -c rollup.config.js",
