@@ -4,6 +4,8 @@ Promise-based dialogs for Vue 3
 
 This package only provides the functional basics for dialogs. It provides no out-of-the-box dialog components or styling. The integration is up to the user. This should make it easier to adapt to existing apps without having clashing style/UX.
 
+You can check out the examples [here](https://schlechtwetterfront.github.io/vue-dialogs)
+
 ## Usage
 
 Install package
