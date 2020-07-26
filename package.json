@@ -15,6 +15,7 @@
         "bundle": "yarn build && yarn build:dts",
         "build": "rollup -c rollup.config.js",
         "build:dts": "api-extractor run --local --verbose",
+        "build:samples": "webpack --env.NODE_ENV=prod --env.prod --env.production",
         "test": "jest",
         "serve": "webpack-dev-server"
     },
