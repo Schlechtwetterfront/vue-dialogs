@@ -1,5 +1,5 @@
 {
-    "name": "vue-dialogs",
+    "name": "@schlechtwetterfront/vue-dialogs",
     "version": "0.1.0",
     "description": "Promise-based vue dialogs",
     "author": "Benedikt Schatz",

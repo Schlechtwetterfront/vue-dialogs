@@ -58,7 +58,7 @@ export default [
     {
         input: 'src/index.ts',
         output: {
-            file: `dist/${manifest.name}.global.prod.js`,
+            file: `dist/vue-dialogs.global.prod.js`,
             format: 'iife',
             name: 'VueDialogs',
             ...outputDefaults,
