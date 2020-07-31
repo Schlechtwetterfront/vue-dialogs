@@ -12,7 +12,7 @@ module.exports = (env = {}) => ({
 
     output: {
         path: outputPath,
-        publicPath: '/',
+        // publicPath: env.prod ? '/vue-dialogs/' : '/',
         filename: 'bundle.js',
     },
 
