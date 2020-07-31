@@ -2,7 +2,7 @@ import { defineComponent, inject, h, VNodeProps } from 'vue';
 import { DIALOGS_KEY } from './injectionKeys';
 import { DialogDef } from './dialogs';
 
-const DialogsContainerImpl = defineComponent({
+export const DialogsContainerImpl = defineComponent({
     name: 'DialogsContainer',
     setup() {
         const dialogs = inject(DIALOGS_KEY);

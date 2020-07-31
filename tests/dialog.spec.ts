@@ -1,4 +1,5 @@
-import { DialogsContainer, useDialogs, dialogs, DIALOGS_KEY, useDialog } from '../src';
+import { DIALOGS_KEY, useDialog } from '../src';
+import { DialogsContainerImpl as DialogsContainer } from '../src/DialogsContainer';
 import { defineComponent, nextTick, reactive } from 'vue';
 import { mount, VueWrapper } from '@vue/test-utils';
 import { createDialogs, Dialogs } from '../src/dialogs';
