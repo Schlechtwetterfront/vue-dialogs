@@ -1,19 +1,28 @@
 {
     "compilerOptions": {
-        "outDir": "./dist/",
-        "sourceMap": true,
-        "noImplicitAny": true,
+        "outDir": "dist",
+        "baseUrl": ".",
+        "rootDir": ".",
+        "sourceMap": false,
+        "noEmit": true,
         "moduleResolution": "node",
-        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
         "module": "esnext",
         "target": "es5",
         "importHelpers": true,
+
+        "noImplicitAny": true,
+        "allowSyntheticDefaultImports": true,
         "strict": true,
-        "baseUrl": ".",
+        "strictNullChecks": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "isolatedModules": false,
+
         "paths": {
             "@/*": ["./src/*"]
         },
-        "lib": ["DOM", "DOM.Iterable", "ESNext", "ScriptHost"]
+        "lib": ["esnext", "DOM"]
     },
     "include": ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*.vue"],
     "exclude": ["node_modules"]

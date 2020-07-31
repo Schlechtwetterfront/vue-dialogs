@@ -1,7 +1,7 @@
 import { App, Plugin } from 'vue';
 import { createDialogs, Dialogs, DialogDef } from './dialogs';
 import { DIALOGS_KEY } from './injectionKeys';
-import DialogsContainer from './DialogsContainer';
+import { DialogsContainer } from './DialogsContainer';
 
 declare module '@vue/runtime-core' {
     interface ComponentCustomProperties {

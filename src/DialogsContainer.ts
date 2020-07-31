@@ -1,8 +1,9 @@
-import { defineComponent, inject, h } from 'vue';
+import { defineComponent, inject, h, VNodeProps } from 'vue';
 import { DIALOGS_KEY } from './injectionKeys';
 import { DialogDef } from './dialogs';
 
-export default defineComponent({
+const DialogsContainerImpl = defineComponent({
+    name: 'DialogsContainer',
     setup() {
         const dialogs = inject(DIALOGS_KEY);
 
@@ -42,3 +43,9 @@ export default defineComponent({
         };
     },
 });
+
+export const DialogsContainer = (DialogsContainerImpl as any) as {
+    new (): {
+        $props: VNodeProps;
+    };
+};

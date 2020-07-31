@@ -18,66 +18,63 @@ const outputDefaults = {
     },
 };
 
+const tsOptions = {
+    tsconfig: './tsconfig.json',
+    tsconfigOverride: {
+        compilerOptions: {
+            sourceMap: true,
+            declaration: true,
+            declarationMap: true,
+        },
+        exclude: ['tests'],
+    },
+};
+
 export default [
     {
         input: 'src/index.ts',
         output: [
+            // global
             {
-                file: `dist/${manifest.name}.js`,
-                format: 'umd',
+                file: manifest.unpkg,
+                format: 'iife',
                 name: 'VueDialogs',
                 ...outputDefaults,
             },
             {
-                file: `dist/${manifest.name}.common.js`,
+                file: manifest.main,
                 format: 'cjs',
                 ...outputDefaults,
             },
             {
-                file: `dist/${manifest.name}.esm.js`,
+                file: manifest.browser,
                 format: 'es',
                 ...outputDefaults,
             },
         ],
         external: ['vue'],
-        plugins: [
-            typescript({
-                tsconfig: './tsconfig.json',
-                tsconfigOverride: {
-                    compilerOptions: {
-                        sourceMap: true,
-                        declaration: true,
-                        declarationMap: true,
-                    },
-                },
-            }),
-            resolve(),
-            commonjs(),
-        ],
+        plugins: [typescript(tsOptions), resolve(), commonjs()],
     },
     {
         input: 'src/index.ts',
         output: {
-            file: `dist/${manifest.name}.min.js`,
-            format: 'umd',
-            name: manifest.name,
+            file: `dist/${manifest.name}.global.prod.js`,
+            format: 'iife',
+            name: 'VueDialogs',
             ...outputDefaults,
         },
         external: ['vue'],
         plugins: [
-            typescript({
-                tsconfig: './tsconfig.json',
-                tsconfigOverride: {
-                    compilerOptions: {
-                        sourceMap: true,
-                        declaration: true,
-                        declarationMap: true,
-                    },
-                },
-            }),
+            typescript(tsOptions),
             resolve(),
             commonjs(),
-            terser(),
+            terser({
+                module: false,
+                compress: {
+                    ecma: 5,
+                    pure_getters: true,
+                },
+            }),
         ],
     },
 ];
