@@ -1,4 +1,4 @@
-# `vue-dialogs` ![npm (scoped)](https://img.shields.io/npm/v/@schlechtwetterfront/vue-dialogs)
+# `vue-dialogs` [![npm (scoped)](https://img.shields.io/npm/v/@schlechtwetterfront/vue-dialogs)](https://www.npmjs.com/package/@schlechtwetterfront/vue-dialogs)
 
 Promise-based dialogs for Vue 3
 
