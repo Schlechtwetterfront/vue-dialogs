@@ -1,6 +1,6 @@
 {
     "name": "@schlechtwetterfront/vue-dialogs",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "description": "Promise-based vue dialogs",
     "author": "Benedikt Schatz",
     "repository": "https://github.com/Schlechtwetterfront/vue-dialogs.git",
