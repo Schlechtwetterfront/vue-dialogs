@@ -1,4 +1,4 @@
-import { ref, markRaw, computed, reactive, ComponentPublicInstance } from 'vue';
+import { ref, markRaw, computed, reactive, ComponentPublicInstance, Ref } from 'vue';
 
 /**
  * Component constructor returned by defineComponent
@@ -9,7 +9,9 @@ type ComponentConstructor<T extends ComponentPublicInstance> = new (...args: any
  * Extract props type if possible
  */
 type ExtractProps<ComponentDef> = ComponentDef extends ComponentConstructor<infer ComponentProps>
-    ? InstanceType<ComponentConstructor<ComponentProps>>['$props']
+    ?
+          | InstanceType<ComponentConstructor<ComponentProps>>['$props']
+          | Ref<InstanceType<ComponentConstructor<ComponentProps>>['$props']>
     : unknown;
 
 /**
